@@ -15,8 +15,8 @@ public class StoreService {
 
     public StoreService(StoreRepository storeRepository) {this.storeRepository = storeRepository;}
 
-    public StoreEntity findByBusinessNo(String businessNo) {
-        return storeRepository.findByBusinessNo(businessNo)
+    public StoreEntity findTopByBusinessNoOrderByRegDateDesc(String businessNo) {
+        return storeRepository.findTopByBusinessNoOrderByRegDateDesc(businessNo)
                 .orElseThrow(() -> new RuntimeException("storeEntity not found for businessNo: " + businessNo));
     }
 }
