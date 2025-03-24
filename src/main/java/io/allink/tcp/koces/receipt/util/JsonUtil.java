@@ -53,35 +53,35 @@ public class JsonUtil {
             // ■ Json 전문 생성
             Receipt jsonReceipt = new Receipt();
             Pay jsonPay = new Pay();
-            PayInfo jsonPayInfo = new PayInfo();
+            PayInfos jsonPayInfos = new PayInfos();
             Mert jsonMert = new Mert();
 
 
-            jsonPayInfo.setPayType(payType);  // CARD, CASH
-            jsonPayInfo.setPayAttr(payAttr);    // 결제(PAY), 결제취소(CNL)
+            jsonPayInfos.setPayType(payType);  // CARD, CASH
+            jsonPayInfos.setPayAttr(payAttr);    // 결제(PAY), 결제취소(CNL)
 
 
             // ■ Pay (신용카드) Data Setter
             if (payType.equals("CARD")) {
-                jsonPayInfo.setCardType(getOrDefault(jsonReceiptEntity.getIssCd()));
-                jsonPayInfo.setCardNo(getOrDefault(jsonReceiptEntity.getCardNo()));
-                jsonPayInfo.setAuthNo(getOrDefault(jsonReceiptEntity.getAuNo()));
-                jsonPayInfo.setPayAmt(getOrDefault(String.valueOf(jsonReceiptEntity.getTrdAmtTot())));
-                jsonPayInfo.setTrdType(getOrDefault(jsonReceiptEntity.getTrdType()));
-                jsonPayInfo.setInsMon(getOrDefault(jsonReceiptEntity.getInsMon()));
-                jsonPayInfo.setTaxAmt(getOrDefault(String.valueOf(jsonReceiptEntity.getTaxAmt())));
-                jsonPayInfo.setTrxDate(getOrDefault(trxDate));
-                jsonPayInfo.setBuyCd(getOrDefault(jsonReceiptEntity.getBuyCd()));
+                jsonPayInfos.setCardType(getOrDefault(jsonReceiptEntity.getIssCd()));
+                jsonPayInfos.setCardNo(getOrDefault(jsonReceiptEntity.getCardNo()));
+                jsonPayInfos.setAuthNo(getOrDefault(jsonReceiptEntity.getAuNo()));
+                jsonPayInfos.setPayAmt(getOrDefault(String.valueOf(jsonReceiptEntity.getTrdAmtTot())));
+                jsonPayInfos.setTrdType(getOrDefault(jsonReceiptEntity.getTrdType()));
+                jsonPayInfos.setInsMon(getOrDefault(jsonReceiptEntity.getInsMon()));
+                jsonPayInfos.setTaxAmt(getOrDefault(String.valueOf(jsonReceiptEntity.getTaxAmt())));
+                jsonPayInfos.setTrxDate(getOrDefault(trxDate));
+                jsonPayInfos.setBuyCd(getOrDefault(jsonReceiptEntity.getBuyCd()));
             }
 
 
             // ■ Pay (현금) Data Setter
             if (payType.equals("CASH")) {
-                jsonPayInfo.setCashAmt(getOrDefault(String.valueOf(jsonReceiptEntity.getTrdAmtTot())));
+                jsonPayInfos.setCashAmt(getOrDefault(String.valueOf(jsonReceiptEntity.getTrdAmtTot())));
             }
 
 
-            jsonPay.setPayInfo(Arrays.asList(jsonPayInfo));
+            jsonPay.setPayInfos(Arrays.asList(jsonPayInfos));
 
 
             // ■ Mert Data Setter
@@ -223,17 +223,16 @@ public class JsonUtil {
     @Getter
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public class Pay {
-        @JsonProperty("PayInfo")
-        private List<PayInfo> PayInfo;
+        @JsonProperty("PayInfos")
+        private List<PayInfos> PayInfos;
     }
-
 
 
     @Data
     @Setter
     @Getter
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    public class PayInfo {
+    public class PayInfos {
         @JsonProperty("PayType")
         private String PayType;
 
