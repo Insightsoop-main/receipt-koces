@@ -109,7 +109,7 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
         jsonReceiptEntity.setBuyCd(Objects.toString(codeService.findByCdGrpAndCdTypeAndCdVal("credit", null, receiptEntity.getBuyCd()), ""));
         jsonReceiptEntity.setDdcYn(Objects.toString(codeService.findByCdGrpAndCdTypeAndCdVal("ddcYn", cdType, receiptEntity.getDdcYn()), ""));
 
-        StoreEntity storeEntity = storeService.findByBusinessNo(StringUtil.formatBusinessNo(receiptEntity.getBusinessNo()));
+        StoreEntity storeEntity = storeService.findTopByBusinessNoOrderByRegDateDesc(StringUtil.formatBusinessNo(receiptEntity.getBusinessNo()));
 
         JsonUtil jsonUtil = new JsonUtil();
         String jsonData = jsonUtil.toJson(storeEntity, jsonReceiptEntity);

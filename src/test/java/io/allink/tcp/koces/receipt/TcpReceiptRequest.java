@@ -13,7 +13,7 @@ import java.nio.charset.StandardCharsets;
 
 public class TcpReceiptRequest {
 
-    private final String host = "43.203.61.90"; // 43.203.61.90
+    private final String host = "127.0.0.1"; // 43.203.61.90
     private final int port = 10033;
 
     @Test

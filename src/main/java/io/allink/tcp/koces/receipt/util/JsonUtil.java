@@ -1,9 +1,12 @@
 package io.allink.tcp.koces.receipt.util;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import io.allink.tcp.koces.receipt.model.ReceiptEntity;
 import io.allink.tcp.koces.receipt.model.StoreEntity;
 import lombok.Data;
@@ -16,12 +19,13 @@ import java.util.List;
 public class JsonUtil {
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
+
     public String toJson(Object mert, Object object) {
 
         StoreEntity storeEntity = (StoreEntity) mert;
         ReceiptEntity jsonReceiptEntity = (ReceiptEntity) object;
 
-        String payType1;
+        String payType;
         String payAttr;
 
         String trxDate = jsonReceiptEntity.getTransDate() + jsonReceiptEntity.getTransTime();
@@ -29,10 +33,10 @@ public class JsonUtil {
 
         // ■ 결제 유형
         switch (jsonReceiptEntity.getSvcType()) {
-            case "CC": payType1 = "CARD"; break;
-            case "CI": payType1 = "CASH";break;
-            case "PA": payType1 = "SPAY"; break;
-            default: payType1 = "CARD";
+            case "CC": payType = "CARD"; break;
+            case "CI": payType = "CASH";break;
+            case "PA": payType = "SPAY"; break;
+            default: payType = "CARD";
         }
 
         // ■ 결제 속성
@@ -51,14 +55,14 @@ public class JsonUtil {
             Pay jsonPay = new Pay();
             PayInfo jsonPayInfo = new PayInfo();
             Mert jsonMert = new Mert();
-            MertInfo jsonMertInfo = new MertInfo();
 
-            jsonPay.setPayType1(payType1);  // CARD, CASH
-            jsonPay.setPayAttr(payAttr);    // 결제(PAY), 결제취소(CNL)
+
+            jsonPayInfo.setPayType(payType);  // CARD, CASH
+            jsonPayInfo.setPayAttr(payAttr);    // 결제(PAY), 결제취소(CNL)
 
 
             // ■ Pay (신용카드) Data Setter
-            if (payType1.equals("CARD")) {
+            if (payType.equals("CARD")) {
                 jsonPayInfo.setCardType(getOrDefault(jsonReceiptEntity.getIssCd()));
                 jsonPayInfo.setCardNo(getOrDefault(jsonReceiptEntity.getCardNo()));
                 jsonPayInfo.setAuthNo(getOrDefault(jsonReceiptEntity.getAuNo()));
@@ -72,7 +76,7 @@ public class JsonUtil {
 
 
             // ■ Pay (현금) Data Setter
-            if (payType1.equals("CASH")) {
+            if (payType.equals("CASH")) {
                 jsonPayInfo.setCashAmt(getOrDefault(String.valueOf(jsonReceiptEntity.getTrdAmtTot())));
             }
 
@@ -98,6 +102,7 @@ public class JsonUtil {
 
 
             // JSON 출력
+//            objectMapper.setPropertyNamingStrategy(PropertyNamingStrategies.LOWER_CAMEL_CASE);
             String jsonOutput = objectMapper.writeValueAsString(jsonReceipt);
 
             System.out.println("@@@@@@ jsonOutput = " + jsonOutput);
@@ -113,105 +118,200 @@ public class JsonUtil {
     @Data
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public class Receipt {
+        @JsonProperty("Pdct")
         private List<Pdct> Pdct;
+
+        @JsonProperty("Header")
         private List<Header> Header;
+
+        @JsonProperty("Etc")
         private List<Etc> Etc;
+
+        @JsonProperty("Pay")
         private List<Pay> Pay;
+
+        @JsonProperty("Mert")
         private List<Mert> Mert;
     }
 
     @Data
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public class Pdct {
+        @JsonProperty("PcptNo")
         private String PcptNo;
+
+        @JsonProperty("TaxAmt")
         private String TaxAmt;
+
+        @JsonProperty("Vat")
         private String Vat;
+
+        @JsonProperty("TotAmt")
         private String TotAmt;
+
+        @JsonProperty("PurcTm")
         private String PurcTm;
+
+        @JsonProperty("PdctList")
         private List<PdctItem> PdctList;
     }
 
     @Data
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public class PdctItem {
+        @JsonProperty("PdctNm")
         private String PdctNm;
+
+        @JsonProperty("PdctNo")
         private String PdctNo;
+
+        @JsonProperty("PdctUntPrt")
         private String PdctUntPrt;
+
+        @JsonProperty("PdctCnt")
         private String PdctCnt;
+
+        @JsonProperty("PdctTotAmt")
         private String PdctTotAmt;
+
+        @JsonProperty("PdctDcAmt")
         private String PdctDcAmt;
     }
 
     @Data
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public class Header {
+        @JsonProperty("TokenKey")
         private String TokenKey;
+
+        @JsonProperty("MertId")
         private String MertId;
+
+        @JsonProperty("PosNo")
         private String PosNo;
+
+        @JsonProperty("TrxId")
         private String TrxId;
+
+        @JsonProperty("CntryCd")
         private String CntryCd;
+
+        @JsonProperty("CharSet")
         private String CharSet;
     }
 
     @Data
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public class Etc {
+        @JsonProperty("EtcType")
         private String EtcType;
+
+        @JsonProperty("EtcInfo")
         private List<EtcInfo> EtcInfo;
     }
 
     @Data
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public class EtcInfo {
+        @JsonProperty("Data")
         private String Data;
     }
+
 
     @Data
     @Setter
     @Getter
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public class Pay {
-        private String PayType1;
-        private String PayType2;
-        private String PayAttr;
+        @JsonProperty("PayInfo")
         private List<PayInfo> PayInfo;
     }
+
+
 
     @Data
     @Setter
     @Getter
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public class PayInfo {
+        @JsonProperty("PayType")
+        private String PayType;
+
+        @JsonProperty("PayAttr")
+        private String PayAttr;
+
+        @JsonProperty("CardType")
         private String CardType;
+
+        @JsonProperty("CardNo")
         private String CardNo;
+
+        @JsonProperty("AuthNo")
         private String AuthNo;
+
+        @JsonProperty("PayAmt")
         private String PayAmt;
+
+        @JsonProperty("CashAmt")
         private String CashAmt;
+
+        @JsonProperty("PontAmt")
         private String PontAmt;
+
+        @JsonProperty("Balance")
         private String Balance;
+
+        @JsonProperty("CpnAmt")
         private String CpnAmt;
+
+        @JsonProperty("BarcdAmt")
         private String BarcdAmt;
+
+        @JsonProperty("SpayAmt")
         private String SpayAmt;
 
+        @JsonProperty("TrdType")
         private String TrdType; // 승인, 취소
+
+        @JsonProperty("InsMon")
         private String InsMon;  // 할부 개월
+
+        @JsonProperty("TaxAmt")
         private String TaxAmt;  // 부가세
+
+        @JsonProperty("TrxDate")
         private String TrxDate; // 거래 일시
+
+        @JsonProperty("BuyCd")
         private String BuyCd;   // 매입사
 
     }
+
 
     @Data
     @Setter
     @Getter
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public class Mert {
+        @JsonProperty("MertNm")
         private String MertNm;
+
+        @JsonProperty("MertAddr1")
         private String MertAddr1;
+
+        @JsonProperty("MertAddr2")
         private String MertAddr2;
+
+        @JsonProperty("MertCeoNm")
         private String MertCeoNm;
+
+        @JsonProperty("MertBizNo")
         private String MertBizNo;
+
+        @JsonProperty("MertPhoneNo")
         private String MertPhoneNo;
+
+        @JsonProperty("MertInfo")
         private List<MertInfo> MertInfo;
     }
 
@@ -220,7 +320,10 @@ public class JsonUtil {
     @Getter
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public class MertInfo {
+        @JsonProperty("Title")
         private String Title;
+
+        @JsonProperty("Value")
         private String Value;
     }
 
