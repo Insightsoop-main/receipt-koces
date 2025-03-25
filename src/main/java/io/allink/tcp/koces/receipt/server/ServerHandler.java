@@ -1,12 +1,10 @@
 package io.allink.tcp.koces.receipt.server;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.allink.tcp.koces.receipt.model.ReceiptEntity;
 import io.allink.tcp.koces.receipt.model.StoreEntity;
 import io.allink.tcp.koces.receipt.protocol.pReceipt;
 import io.allink.tcp.koces.receipt.service.CodeService;
-import io.allink.tcp.koces.receipt.service.PayloadsService;
+import io.allink.tcp.koces.receipt.service.mertReceiptService;
 import io.allink.tcp.koces.receipt.service.ReceiptService;
 import io.allink.tcp.koces.receipt.service.StoreService;
 import io.allink.tcp.koces.receipt.util.JsonUtil;
@@ -24,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
-import java.util.UUID;
 
 @Slf4j
 @Component
@@ -45,7 +42,7 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
     private StoreService storeService;
 
     @Autowired
-    private PayloadsService payloadsService;
+    private mertReceiptService mertReceiptService;
 
 
     private final int DATA_LENGTH = 600;
@@ -116,7 +113,7 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
 
 
         // ■ receipt_merchants_payloads Insert 처리
-        payloadsService.insertWithJson(receiptEntity.getMchNo(), jsonData, receiptEntity.getTermId(), receiptEntity.getTrdUniKey());
+        mertReceiptService.insertWithJson(receiptEntity.getMchNo(), jsonData, receiptEntity.getTermId(), receiptEntity.getTrdUniKey());
 
 
         // ■ 응답 발송
