@@ -13,7 +13,6 @@ public class ReceiptServerStartupTask implements ApplicationListener<Application
 
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
-        // todo
         receiptServer.start();
     }
 }

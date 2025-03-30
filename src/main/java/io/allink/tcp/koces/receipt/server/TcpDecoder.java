@@ -1,6 +1,6 @@
 package io.allink.tcp.koces.receipt.server;
 
-import io.allink.tcp.koces.receipt.protocol.pReceipt;
+import io.allink.tcp.koces.receipt.protocol.KocesMessage;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
@@ -25,7 +25,7 @@ public class TcpDecoder extends ByteToMessageDecoder {
             return;
         }
 
-        pReceipt receipt = new pReceipt();
+        KocesMessage receipt = new KocesMessage();
 
         receipt.setMsgLength(readString(in, 4)); // 전문길이 (4)
         receipt.setAnswerCd(readString(in, 4)); // 응답코드 (4)

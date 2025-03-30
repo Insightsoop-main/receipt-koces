@@ -1,11 +1,12 @@
 package io.allink.tcp.koces.receipt.server;
 
-import io.allink.tcp.koces.receipt.model.ReceiptEntity;
+import java.util.Objects;
+
+import org.springframework.stereotype.Component;
+
 import io.allink.tcp.koces.receipt.model.StoreEntity;
-import io.allink.tcp.koces.receipt.protocol.pReceipt;
-import io.allink.tcp.koces.receipt.service.CodeService;
-import io.allink.tcp.koces.receipt.service.mertReceiptService;
-import io.allink.tcp.koces.receipt.service.ReceiptService;
+import io.allink.tcp.koces.receipt.protocol.KocesMessage;
+import io.allink.tcp.koces.receipt.service.MerchantReceiptService;
 import io.allink.tcp.koces.receipt.service.StoreService;
 import io.allink.tcp.koces.receipt.util.JsonUtil;
 import io.allink.tcp.koces.receipt.util.StringUtil;
@@ -18,10 +19,15 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.CharsetUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import java.util.Objects;
+import static io.allink.tcp.koces.receipt.common.Code.CANCEL_TYPE_MAP;
+import static io.allink.tcp.koces.receipt.common.Code.CARD_COMPANY_MAP;
+import static io.allink.tcp.koces.receipt.common.Code.CHECK_YN_MAP;
+import static io.allink.tcp.koces.receipt.common.Code.DDC_YN_MAP;
+import static io.allink.tcp.koces.receipt.common.Code.FOREIGN_YN_MAP;
+import static io.allink.tcp.koces.receipt.common.Code.PAY_TYPE_MAP;
+import static io.allink.tcp.koces.receipt.common.Code.SVC_TYPE_MAP;
+import static io.allink.tcp.koces.receipt.common.Code.SWIPE_MAP;
+import static io.allink.tcp.koces.receipt.common.Code.TRD_TYPE_MAP;
 
 @Slf4j
 @Component
@@ -29,109 +35,77 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class ServerHandler extends ChannelInboundHandlerAdapter {
 
-    @Autowired
-    private pReceipt receipt;
+  private KocesMessage receipt;
 
-    @Autowired
-    private ReceiptService receiptService;
+  private final StoreService storeService;
 
-    @Autowired
-    private CodeService codeService;
+  private final MerchantReceiptService mertReceiptService;
 
-    @Autowired
-    private StoreService storeService;
+  @Override
+  public void handlerAdded(ChannelHandlerContext ctx) {
+    int DATA_LENGTH = 600;
+    ctx.alloc().buffer(DATA_LENGTH);
+  }
 
-    @Autowired
-    private mertReceiptService mertReceiptService;
+  @Override
+  public void channelActive(ChannelHandlerContext ctx) {
+    String remoteAddress = ctx.channel().remoteAddress().toString();
+    log.info("channel active: {}", remoteAddress);
+  }
 
+  @Override
+  public void channelInactive(ChannelHandlerContext ctx) {
+    String serverId = ctx.channel().id().asShortText();
+    log.info("Client disconnected: " + ctx.channel().remoteAddress());
+  }
 
-    private final int DATA_LENGTH = 600;
-    private ByteBuf buff;
+  @Override
+  public void channelRead(ChannelHandlerContext ctx, Object message) {
+    receipt = (KocesMessage) message;
+    log.info("Received message: {}", receipt);
+    StoreEntity store = storeService.getStore(receipt.getMchNo());
+    if (store == null) {
+      receipt.setAnswerCd("ER02"); //가맹점 없음
+    } else if (mertReceiptService.isNotExistsMerchantTag(receipt.getMchNo(), receipt.getTermId())) {
+      receipt.setAnswerCd("ER02"); //등록된 태그가 없음
+    } else if (mertReceiptService.isExists(receipt.getTrdUniKey())) {
+      receipt.setAnswerCd("ER01"); //중복 요청
+    } else {
+      // ■ 성공 응답
+      receipt.setAnswerCd("0000");
+      String svcType = Objects.toString(receipt.getSvcType(), "");
+      KocesMessage kocesMessage = new KocesMessage(receipt);
 
+      kocesMessage.setTrdType(TRD_TYPE_MAP.getOrDefault(svcType + receipt.getTrdType(), svcType + receipt.getTrdType()));
+      kocesMessage.setCardNo(StringUtil.maskCardNumber(receipt.getCardNo()));
+      kocesMessage.setSvcType(SVC_TYPE_MAP.getOrDefault(svcType, svcType));
+      kocesMessage.setPayGubun(PAY_TYPE_MAP.getOrDefault(receipt.getPayGubun(), receipt.getPayGubun()));
+      kocesMessage.setInsMon(receipt.getInsMon().equals("00") ? "일시불" : receipt.getInsMon());
+      kocesMessage.setCancelCd(CANCEL_TYPE_MAP.getOrDefault(receipt.getCancelCd(), receipt.getCancelCd()));
+      kocesMessage.setIssCd(CARD_COMPANY_MAP.getOrDefault(receipt.getIssCd(), receipt.getIssCd()));
+      kocesMessage.setBuyCd(CARD_COMPANY_MAP.getOrDefault(receipt.getBuyCd(), receipt.getBuyCd()));
+      kocesMessage.setDdcYn(DDC_YN_MAP.getOrDefault(svcType + receipt.getDdcYn(), svcType + receipt.getDdcYn()));
+      kocesMessage.setCheckYn(CHECK_YN_MAP.getOrDefault(svcType + receipt.getCheckYn(), svcType + receipt.getCheckYn()));
+      kocesMessage.setForeignYn(FOREIGN_YN_MAP.getOrDefault(svcType + receipt.getForeignYn(), svcType + receipt.getForeignYn()));
+      kocesMessage.setSwipe(SWIPE_MAP.getOrDefault(receipt.getSwipe(), receipt.getSwipe()));
 
-    @Override
-    public void handlerAdded(ChannelHandlerContext ctx) {
-        buff = ctx.alloc().buffer(DATA_LENGTH);
+      mertReceiptService.insertWithJson(receipt.getMchNo(), JsonUtil.toJson(store, kocesMessage), receipt.getTermId(), receipt.getTrdUniKey());
     }
+    // ■ 응답 발송
+    ByteBuf reqBuf = Unpooled.copiedBuffer(receipt.getResponse(), CharsetUtil.UTF_8);
+    ctx.writeAndFlush(reqBuf).addListener(ChannelFutureListener.CLOSE);
 
-    @Override
-    public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
-        buff = null;
-    }
+  }
 
-    @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        String remoteAddress = ctx.channel().remoteAddress().toString();
-        log.info("channel active: {}", remoteAddress);
-    }
+  @Override
+  public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+    // 실패 응답
+    receipt.setAnswerCd("ER03");
+    ByteBuf reqBuf = Unpooled.copiedBuffer(receipt.getResponse(), CharsetUtil.UTF_8);
+    ctx.writeAndFlush(reqBuf).addListener(ChannelFutureListener.CLOSE);
 
-    @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        String serverId = ctx.channel().id().asShortText();
-        log.info("Client disconnected: " + ctx.channel().remoteAddress());
-    }
-
-    @Override
-    public void channelRead(ChannelHandlerContext ctx, Object message) throws Exception {
-
-        receipt = (pReceipt) message;
-
-        // ■ 성공 응답
-        receipt.setAnswerCd("0000");
-        receipt.getReceiptPrint();
-
-
-        // ■ 통신 Data Database 저장
-        ReceiptEntity receiptEntity = new ReceiptEntity();
-
-        receiptEntity.setReceiptEntity(receipt);
-
-        Long retReceiptSeq = receiptService.saveAndGetSerialNumber(receiptEntity);
-
-        log.info("📩 retReceiptSeq: " + retReceiptSeq);
-
-
-        // ■ Json 형태 로 Data 변경 (코드 성 -> 노출 데이터로 치환)
-        ReceiptEntity jsonReceiptEntity = new ReceiptEntity();
-        jsonReceiptEntity = receiptEntity;
-
-        String cdType = jsonReceiptEntity.getSvcType();
-
-        jsonReceiptEntity.setTrdType(Objects.toString(codeService.findByCdGrpAndCdTypeAndCdVal("trdType", cdType, receiptEntity.getTrdType()), ""));
-        jsonReceiptEntity.setCardNo(StringUtil.maskCardNumber(receiptEntity.getCardNo()));
-        jsonReceiptEntity.setPayGubun(Objects.toString(codeService.findByCdGrpAndCdTypeAndCdVal("payGubun", null, receiptEntity.getPayGubun()), ""));
-        jsonReceiptEntity.setInsMon(receiptEntity.getInsMon().equals("00") ? "일시불" : receiptEntity.getInsMon());
-        jsonReceiptEntity.setCancelCd(Objects.toString(codeService.findByCdGrpAndCdTypeAndCdVal("cancelCd", null, receiptEntity.getCancelCd()), ""));
-        jsonReceiptEntity.setIssCd(Objects.toString(codeService.findByCdGrpAndCdTypeAndCdVal("credit", null, receiptEntity.getIssCd()), ""));
-        jsonReceiptEntity.setBuyCd(Objects.toString(codeService.findByCdGrpAndCdTypeAndCdVal("credit", null, receiptEntity.getBuyCd()), ""));
-        jsonReceiptEntity.setDdcYn(Objects.toString(codeService.findByCdGrpAndCdTypeAndCdVal("ddcYn", cdType, receiptEntity.getDdcYn()), ""));
-
-        StoreEntity storeEntity = storeService.findTopByBusinessNoOrderByRegDateDesc(StringUtil.formatBusinessNo(receiptEntity.getBusinessNo()));
-
-        JsonUtil jsonUtil = new JsonUtil();
-        String jsonData = jsonUtil.toJson(storeEntity, jsonReceiptEntity);
-
-
-        // ■ receipt_merchants_payloads Insert 처리
-        mertReceiptService.insertWithJson(receiptEntity.getMchNo(), jsonData, receiptEntity.getTermId(), receiptEntity.getTrdUniKey());
-
-
-        // ■ 응답 발송
-        ByteBuf reqBuf = Unpooled.copiedBuffer(receipt.setReceipt(), CharsetUtil.UTF_8);
-        ctx.writeAndFlush(reqBuf).addListener(ChannelFutureListener.CLOSE);
-
-    }
-
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        // 실패 응답
-        receipt.setAnswerCd("9999");
-
-        ByteBuf reqBuf = Unpooled.copiedBuffer(receipt.setReceipt(), CharsetUtil.UTF_8);
-        ctx.writeAndFlush(reqBuf).addListener(ChannelFutureListener.CLOSE);
-
-        // Close the connection when an exception is raised.
-        ctx.close();
-        log.error("exception caught: {}", cause.getMessage());
-    }
+    // Close the connection when an exception is raised.
+    ctx.close();
+    log.error("exception caught: {}", cause.getMessage());
+  }
 }

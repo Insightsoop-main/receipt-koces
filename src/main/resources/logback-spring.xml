@@ -7,7 +7,7 @@
     <property name="LOG_LEVEL_HIBERNATE" value="info"/>
 
     <springProfile name="!(dev | prod)">
-        <property name="FILE_PATH" value="D:/logs/kocesreceipt/logs"/>
+        <property name="FILE_PATH" value="/Volumes/Workspaces/workspace/projects/Allink/app/bitbucket/e-receipt-koces-tcp/logs"/>
         <property name="PATTERN" value="%d{HH:mm:ss.SSS}:[%cyan(%X{reqID:-startup})][%.20thread] %-4level [%logger{5}.%method:%line]- %msg%n"/>
         <property name="LOG_LEVEL_HIBERNATE" value="debug"/>
     </springProfile>

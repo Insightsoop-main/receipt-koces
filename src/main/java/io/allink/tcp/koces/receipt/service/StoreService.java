@@ -13,10 +13,15 @@ import java.util.Optional;
 public class StoreService {
     private final StoreRepository storeRepository;
 
-    public StoreService(StoreRepository storeRepository) {this.storeRepository = storeRepository;}
-
-    public StoreEntity findTopByBusinessNoOrderByRegDateDesc(String businessNo) {
-        return storeRepository.findTopByBusinessNoOrderByRegDateDesc(businessNo)
-                .orElseThrow(() -> new RuntimeException("storeEntity not found for businessNo: " + businessNo));
+    public StoreService(StoreRepository storeRepository) {
+        this.storeRepository = storeRepository;
     }
+
+    public StoreEntity getStore(String storeUid) {
+        return storeRepository.findById(storeUid).orElse(null);
+    }
+
+    /*public StoreEntity findTopByBusinessNoOrderByRegDateDesc(String businessNo) {
+        return storeRepository.findTopByBusinessNoOrderByRegDateDesc(businessNo).orElse(null);
+    }*/
 }

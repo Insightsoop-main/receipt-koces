@@ -57,3 +57,27 @@ spring:
     show-sql: true
   server:
     port: 10033
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
+  datasource:
+    url: jdbc:postgresql://localhost:5432/e-receipt
+    username: allink-admin
+    password: "devonshin120#$"
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      auto-commit: true
+      connection-timeout: 10000
+      maximum-pool-size: 15
+      minimum-idle: 1
+  jpa:
+    database: postgresql
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+  server:
+    port: 10033
