@@ -83,6 +83,10 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: | # Docker 빌드 시 전달할 인수들
             PROFILE=${{ env.BUILD_ARG_PROFILE }}
+            SERVER_PORT=${{ vars.SERVER_PORT }}
+            RECEIPT_DATASOURCE_PG_URL=${{ secrets.RECEIPT_DATASOURCE_PG_URL }}
+            RECEIPT_DATASOURCE_PG_USERNAME=${{ secrets.RECEIPT_DATASOURCE_PG_USERNAME }}
+            RECEIPT_DATASOURCE_PG_PASSWORD=${{ secrets.RECEIPT_DATASOURCE_PG_PASSWORD }}
 
       # 10. AWS 자격 증명 설정
       - name: Configure AWS Credentials
