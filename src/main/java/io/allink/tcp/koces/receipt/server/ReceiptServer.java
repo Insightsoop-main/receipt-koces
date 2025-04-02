@@ -26,7 +26,7 @@ public class ReceiptServer {
     public void start() {
         try {
             ChannelFuture serverChannelFuture = serverBootstrap.bind(port).sync();
-            System.out.println("🚀 KocessReceipt TCP 서버가 포트 " + port.getPort() + "에서 실행 중...");
+            log.info("🚀 KocessReceipt TCP 서버가 포트 " + port.getPort() + "에서 실행 중...");
             serverChannel = serverChannelFuture.channel().closeFuture().sync().channel();
         } catch (InterruptedException e) {
             throw new RuntimeException(e);

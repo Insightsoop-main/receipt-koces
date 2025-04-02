@@ -55,7 +55,7 @@ public class TcpReceiptRequest {
         @Override
         protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) {
             String response = msg.toString(StandardCharsets.UTF_8);
-            System.out.println("Server Response: " + response);
+            log.info("Server Response: " + response);
         }
 
         @Override

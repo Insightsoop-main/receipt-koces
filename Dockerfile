@@ -13,7 +13,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 ENV \
     SPRING_PROFILES_ACTIVE=$PROFILE \
     JAVA_OPTS="--add-exports java.base/sun.net.www.protocol.https=ALL-UNNAMED \
-               -Dspring.server.port=$SERVER_PORT \
+               -Dserver.port=$SERVER_PORT \
                -Dspring.datasource.url=$RECEIPT_DATASOURCE_PG_URL \
                -Dspring.datasource.username=$RECEIPT_DATASOURCE_PG_USERNAME \
                -Dspring.datasource.password=$RECEIPT_DATASOURCE_PG_PASSWORD"

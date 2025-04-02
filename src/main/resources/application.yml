@@ -30,8 +30,8 @@ spring:
     hibernate:
       ddl-auto: none
     show-sql: true
-  server:
-    port: 10033
+server:
+  port: 10033
 
 ---
 spring:
@@ -55,8 +55,8 @@ spring:
     hibernate:
       ddl-auto: none
     show-sql: true
-  server:
-    port: 10033
+server:
+  port: 10033
 ---
 spring:
   config:
@@ -79,8 +79,8 @@ spring:
     hibernate:
       ddl-auto: none
     show-sql: true
-  server:
-    port: 10033
+server:
+  port: 10033
 
 # production 실 운영 환경
 ---

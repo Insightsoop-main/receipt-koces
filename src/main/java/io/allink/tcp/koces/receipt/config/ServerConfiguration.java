@@ -16,7 +16,7 @@ import java.net.InetSocketAddress;
 @Configuration
 @RequiredArgsConstructor
 public class ServerConfiguration {
-    @Value("${spring.server.port}")
+    @Value("${server.port}")
     private int port;
 
     @Bean
