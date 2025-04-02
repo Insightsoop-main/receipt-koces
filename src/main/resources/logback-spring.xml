@@ -12,6 +12,12 @@
         <property name="LOG_LEVEL_HIBERNATE" value="debug"/>
     </springProfile>
 
+    <springProfile name="production">
+        <property name="FILE_PATH" value="/app/logs"/>
+        <property name="PATTERN" value="%d{HH:mm:ss.SSS}:[%cyan(%X{reqID:-startup})][%.20thread] %-4level [%logger{5}.%method:%line]- %msg%n"/>
+        <property name="LOG_LEVEL_HIBERNATE" value="debug"/>
+    </springProfile>
+
     <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <Pattern>${PATTERN}</Pattern>
@@ -96,6 +102,14 @@
     <springProfile name="prod">
         <root level="info">
         	<appender-ref ref="Console"/>
+            <appender-ref ref="InfoFile"/>
+            <appender-ref ref="Error"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="production">
+        <root level="info">
+            <appender-ref ref="Console"/>
             <appender-ref ref="InfoFile"/>
             <appender-ref ref="Error"/>
         </root>

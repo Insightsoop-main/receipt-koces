@@ -81,3 +81,29 @@ spring:
     show-sql: true
   server:
     port: 10033
+
+# production 실 운영 환경
+---
+spring:
+  config:
+    activate:
+      on-profile: production
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
+  datasource:
+    url: jdbc:postgresql://rds-receipt-rds-postgre-1.c1c4qiws48sg.ap-northeast-2.rds.amazonaws.com:5432/e-receipt
+    username: allink_db_admin
+    password: "xlJlG822TaF$WK^3afMfte2RxuS!0o"
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      auto-commit: true
+      connection-timeout: 10000
+      maximum-pool-size: 15
+      minimum-idle: 1
+  jpa:
+    database: postgresql
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+  server:
+    port: 10033
