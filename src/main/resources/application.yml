@@ -1,8 +1,8 @@
 spring:
   profiles:
-    active: dev #prod
+    active: prod
   application:
-    name: kocesReceipt
+    name: koces-receipt
 
 logging:
   level:

@@ -17,8 +17,10 @@ public class StoreService {
         this.storeRepository = storeRepository;
     }
 
-    public StoreEntity getStore(String storeUid) {
-        return storeRepository.findById(storeUid).orElse(null);
+    public StoreEntity getStore(String storeUidLike, String businessNo) {
+
+        return storeRepository.findTopByStoreUidLikeAndBusinessNo(storeUidLike,
+            businessNo.replaceAll("(\\d{3})(\\d{2})(\\d{5})", "$1-$2-$3")).orElse(null);
     }
 
     /*public StoreEntity findTopByBusinessNoOrderByRegDateDesc(String businessNo) {

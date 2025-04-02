@@ -9,5 +9,5 @@ import java.util.Optional;
 
 @Repository
 public interface StoreRepository extends JpaRepository<StoreEntity, String> {
-//    Optional<StoreEntity> findTopByBusinessNoOrderByRegDateDesc(String businessNo);
+    Optional<StoreEntity> findTopByStoreUidLikeAndBusinessNo(String storeUidLike, String businessNo);
 }
