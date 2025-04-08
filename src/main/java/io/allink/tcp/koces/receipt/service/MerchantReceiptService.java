@@ -3,6 +3,7 @@ package io.allink.tcp.koces.receipt.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import io.allink.tcp.koces.receipt.protocol.KocesMessage;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.Query;
@@ -19,30 +20,17 @@ public class MerchantReceiptService {
   public MerchantReceiptService() {
   }
 
-  /**
-   * JPA Entity 로 할 경우 Json 관련 Type 으로 인해 오류 Type 무시 하고 직접 Insert 하는 방식으로 변경.
-   *
-   * @param merchantId
-   * @param payload
-   * @param deviceId
-   * @param trxId
-   */
   @Transactional
-  public void insertWithJson(String merchantId, String payload, String deviceId, String trxId) {
-
-    log.info("@@@@@ MerchantId: {}", merchantId);
-    log.info("@@@@@ trxId: {}", trxId);
-    log.info("@@@@@ payload: {}", payload);
-    log.info("@@@@@ deviceId: {}", deviceId);
+  public void insertWithJson(KocesMessage receipt, String payload) {
 
     String sql = "INSERT INTO merchant_receipt(receipt_uuid, reg_date, merchant_id, payload, device_id, trx_id) VALUES (uuid_generate_v4(), now(), ?, ?::json, ?, ?)";
 
     Query query = entityManager.createNativeQuery(sql);
 
-    query.setParameter(1, merchantId);
+    query.setParameter(1, receipt.getMchNo());
     query.setParameter(2, payload);
-    query.setParameter(3, deviceId);
-    query.setParameter(4, "koces-" + trxId);
+    query.setParameter(3, receipt.getTermId());
+    query.setParameter(4, "koces-" + receipt.getTrdUniKey());
     query.executeUpdate();
   }
 

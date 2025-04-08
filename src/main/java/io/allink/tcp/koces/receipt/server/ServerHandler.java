@@ -63,11 +63,11 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
   public void channelRead(ChannelHandlerContext ctx, Object message) {
     receipt = (KocesMessage) message;
     log.info("Received message: {}", receipt);
-    String merchantId = receipt.getMchNo() + "-" + receipt.getBusinessNo();
-    StoreEntity store = storeService.getStore(receipt.getMchNo(), receipt.getBusinessNo());
+    //코세스에서 가맹점 정보를 전달 받을 경우엔 mchNo + bzNo가 storeUid 가 된다
+    StoreEntity store = storeService.getStore(receipt.getMchNo() + "-" + receipt.getBusinessNo());
     if (store == null) {
       receipt.setAnswerCd("ER02"); //가맹점 없음
-    } else if (mertReceiptService.isNotExistsMerchantTag(merchantId, receipt.getTermId())) {
+    } else if (mertReceiptService.isNotExistsMerchantTag(receipt.getMchNo(), receipt.getTermId())) {
       receipt.setAnswerCd("ER02"); //등록된 태그가 없음
     } else if (mertReceiptService.isExists(receipt.getTrdUniKey())) {
       receipt.setAnswerCd("ER01"); //중복 요청
@@ -90,9 +90,7 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
       kocesMessage.setForeignYn(FOREIGN_YN_MAP.getOrDefault(svcType + receipt.getForeignYn(), svcType + receipt.getForeignYn()));
       kocesMessage.setSwipe(SWIPE_MAP.getOrDefault(receipt.getSwipe(), receipt.getSwipe()));
 
-
-
-      mertReceiptService.insertWithJson(merchantId, JsonUtil.toJson(store, kocesMessage), receipt.getTermId(), receipt.getTrdUniKey());
+      mertReceiptService.insertWithJson(receipt, JsonUtil.toJson(store, kocesMessage));
     }
     // ■ 응답 발송
     ByteBuf reqBuf = Unpooled.copiedBuffer(receipt.getResponse(), CharsetUtil.UTF_8);
