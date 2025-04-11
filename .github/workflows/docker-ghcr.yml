@@ -4,7 +4,7 @@ on:
   push:
     branches: [ "production" ]
   pull_request:
-    branches-ignore: [ "main" ]
+    branches: [ "production" ]
 
 env:
   REGISTRY: ghcr.io
@@ -12,6 +12,9 @@ env:
 
 jobs:
   build-and-push:
+    if: |
+      github.event_name == 'push' || 
+      (github.event_name == 'pull_request' && github.base_ref == 'refs/heads/production')
     runs-on: ubuntu-latest
     environment: prod_env
     permissions:
@@ -100,6 +103,6 @@ jobs:
       - name: Execute Script via SSM
         run: |
           aws ssm send-command \
-            --instance-ids ${{ vars.TARGET_INSTANCE_ID }} \
+            --targets "Key=tag:${{ vars.INST_TAG_KEY }},Values=${{ vars.INST_TAG_VAL }}" \
             --document-name "AWS-RunShellScript" \
             --parameters '{"commands":["cd /home/ec2-user && ./pull_and_run.sh"]}'
