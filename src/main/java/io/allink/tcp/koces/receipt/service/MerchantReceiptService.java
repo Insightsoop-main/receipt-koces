@@ -23,7 +23,7 @@ public class MerchantReceiptService {
   @Transactional
   public void insertWithJson(KocesMessage receipt, String payload) {
 
-    String sql = "INSERT INTO merchant_receipt(receipt_uuid, reg_date, merchant_id, payload, device_id, trx_id) VALUES (uuid_generate_v4(), now(), ?, ?::json, ?, ?)";
+    String sql = "INSERT INTO merchant_receipt(receipt_uuid, reg_date, merchant_store_id, payload, device_id, trx_id) VALUES (uuid_generate_v4(), now(), ?, ?::json, ?, ?)";
 
     Query query = entityManager.createNativeQuery(sql);
 
@@ -50,7 +50,7 @@ public class MerchantReceiptService {
 
   @org.springframework.transaction.annotation.Transactional(readOnly = true)
   public boolean isNotExistsMerchantTag(String merchantId, String deviceId) {
-    String sql = "select 1 from merchant_tag mt where mt.merchant_id = ? and mt.device_id = ?";
+    String sql = "select 1 from merchant_tag mt where mt.merchant_store_id = ? and mt.device_id = ?";
     Query query = entityManager.createNativeQuery(sql);
     query.setParameter(1, merchantId);
     query.setParameter(2, deviceId);
