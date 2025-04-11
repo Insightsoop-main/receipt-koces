@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import org.springframework.stereotype.Component;
 
-import io.allink.tcp.koces.receipt.model.StoreEntity;
+import io.allink.tcp.koces.receipt.model.Store;
 import io.allink.tcp.koces.receipt.protocol.KocesMessage;
 import io.allink.tcp.koces.receipt.service.MerchantReceiptService;
 import io.allink.tcp.koces.receipt.service.StoreService;
@@ -63,8 +63,9 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
   public void channelRead(ChannelHandlerContext ctx, Object message) {
     receipt = (KocesMessage) message;
     log.info("Received message: {}", receipt);
-    //코세스에서 가맹점 정보를 전달 받을 경우엔 mchNo + bzNo가 storeUid 가 된다
-    StoreEntity store = storeService.getStore(receipt.getMchNo() + "-" + receipt.getBusinessNo());
+
+    Store store = storeService.getStore(receipt.getMchNo(), receipt.getTermId());
+
     if (store == null) {
       receipt.setAnswerCd("ER02"); //가맹점 없음
     } else if (mertReceiptService.isNotExistsMerchantTag(receipt.getMchNo(), receipt.getTermId())) {

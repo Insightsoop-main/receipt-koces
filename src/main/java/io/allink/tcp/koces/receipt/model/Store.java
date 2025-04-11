@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Entity
 @Table(name = "store")
-public class StoreEntity {
+public class Store {
 
     @Id
     @Column(name = "store_uid", length = 36, nullable = false)
@@ -22,18 +22,22 @@ public class StoreEntity {
     @Column(name = "store_name", nullable = false)
     private String storeName;
 
+/*
     @Column(name = "store_type", length = 255)
     private String storeType = "DEF";
+*/
 
+/*
     @Column(name = "zone_code", length = 255)
     private String zoneCode;
+*/
 
-    @Column(name = "addr1", length = 255)
+    @Column(name = "addr1")
     private String addr1;
 
-    @Column(name = "addr2", length = 255)
+    @Column(name = "addr2")
     private String addr2;
-
+/*
     @CreationTimestamp
     @Column(name = "reg_date", updatable = false)
     private LocalDateTime regDate;
@@ -62,9 +66,6 @@ public class StoreEntity {
     @Column(name = "tel", length = 15)
     private String tel;
 
-    @Column(name = "mobile", length = 15)
-    private String mobile;
-
     @Column(name = "manager_name", length = 30)
     private String managerName;
 
@@ -72,17 +73,20 @@ public class StoreEntity {
     private String siteLink;
 
     @Column(name = "receipt_width_inch", length = 255)
-    private String receiptWidthInch;
+    private String receiptWidthInch;*/
 
-    @Column(name = "work_type", length = 100)
-    private String workType;
+    /*@Column(name = "work_type", length = 100)
+    private String workType;*/
+
+    @Column(name = "mobile", length = 15)
+    private String mobile;
 
     @Column(name = "business_no", length = 30)
     private String businessNo;
 
     @Column(name = "ceo_name", length = 30)
     private String ceoName;
-
+/*
     @Column(name = "business_type", length = 255)
     private String businessType;
 
@@ -96,6 +100,6 @@ public class StoreEntity {
     private String partnerLoginId;
 
     @Column(name = "partner_login_pword", length = 255)
-    private String partnerLoginPword;
+    private String partnerLoginPword;*/
 }
 

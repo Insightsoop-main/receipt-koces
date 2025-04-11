@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.allink.tcp.koces.receipt.model.StoreEntity;
+import io.allink.tcp.koces.receipt.model.Store;
 import io.allink.tcp.koces.receipt.protocol.KocesMessage;
 import lombok.Data;
 import lombok.Getter;
@@ -16,7 +16,7 @@ import lombok.Setter;
 public class JsonUtil {
   private static final ObjectMapper objectMapper = new ObjectMapper();
 
-  public static String toJson(StoreEntity store, KocesMessage message) {
+  public static String toJson(Store store, KocesMessage message) {
 
     try {
       // ■ Json 전문 생성
