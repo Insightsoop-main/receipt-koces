@@ -16,7 +16,7 @@ import java.net.InetSocketAddress;
 @Configuration
 @RequiredArgsConstructor
 public class ServerConfiguration {
-    @Value("${server.port}")
+    @Value("${server.netty.port}")
     private int port;
 
     @Bean

@@ -1,7 +1,7 @@
 FROM eclipse-temurin:17-jre-jammy
 
 ARG PROFILE
-ARG SERVER_PORT
+ARG NETTY_SERVER_PORT
 ARG RECEIPT_DATASOURCE_PG_URL
 ARG RECEIPT_DATASOURCE_PG_USERNAME
 ARG RECEIPT_DATASOURCE_PG_PASSWORD
@@ -13,7 +13,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 ENV \
     SPRING_PROFILES_ACTIVE=$PROFILE \
     JAVA_OPTS="--add-exports java.base/sun.net.www.protocol.https=ALL-UNNAMED \
-               -Dserver.port=$SERVER_PORT \
+               -Dserver.netty.port=$NETTY_SERVER_PORT \
                -Dspring.datasource.url=$RECEIPT_DATASOURCE_PG_URL \
                -Dspring.datasource.username=$RECEIPT_DATASOURCE_PG_USERNAME \
                -Dspring.datasource.password=$RECEIPT_DATASOURCE_PG_PASSWORD"
@@ -24,7 +24,8 @@ WORKDIR /app
 COPY build/libs/koces-receipt-v1.0.jar ./app.jar
 
 # 포트 노출 (스프링 부트 기본 포트)
-EXPOSE $SERVER_PORT
+EXPOSE 8080
+EXPOSE $NETTY_SERVER_PORT
 
 # 진입점
 ENTRYPOINT ["sh", "-c", "exec java ${JAVA_OPTS} -jar /app/app.jar"]
