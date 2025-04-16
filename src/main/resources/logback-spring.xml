@@ -62,7 +62,7 @@
         </rollingPolicy>
     </appender>
 
-    <springProfile name="!prod">
+    <springProfile name="!production">
         <root level="debug">
             <appender-ref ref="Console"/>
             <appender-ref ref="InfoFile"/>
@@ -97,14 +97,6 @@
             <appender-ref ref="sqlRollingFile" />
         </logger>
 
-    </springProfile>
-
-    <springProfile name="prod">
-        <root level="info">
-        	<appender-ref ref="Console"/>
-            <appender-ref ref="InfoFile"/>
-            <appender-ref ref="Error"/>
-        </root>
     </springProfile>
 
     <springProfile name="production">

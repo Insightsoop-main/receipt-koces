@@ -68,7 +68,9 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
 
     if (store == null) {
       receipt.setAnswerCd("ER02"); //가맹점 없음
+      log.error("store not found: merchantNo = {} termialId = {}", receipt.getMchNo(), receipt.getTermId());
     } else if (mertReceiptService.isNotExistsMerchantTag(receipt.getMchNo(), receipt.getTermId())) {
+      log.error("tag not found: merchantNo = {} termialId = {}", receipt.getMchNo(), receipt.getTermId());
       receipt.setAnswerCd("ER02"); //등록된 태그가 없음
     } else if (mertReceiptService.isExists(receipt.getTrdUniKey())) {
       receipt.setAnswerCd("ER01"); //중복 요청
