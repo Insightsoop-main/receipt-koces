@@ -24,6 +24,14 @@ public class StringUtil {
     }
 
     // 기본적인 고정 길이 포맷 (기본은 Space Padding)
+    public static String defaultVal(String value, String defaultVal) {
+        if (value == null || value.isEmpty()) {
+            return defaultVal;
+        }
+        return value;
+    }
+
+    // 기본적인 고정 길이 포맷 (기본은 Space Padding)
     public static String formatFixedLength(String value, int length) {
         return leftJustifyWithSpace(value, length);
     }

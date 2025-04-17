@@ -63,8 +63,12 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
   public void channelRead(ChannelHandlerContext ctx, Object message) {
     receipt = (KocesMessage) message;
     log.info("Received message: {}", receipt);
-
-    Store store = storeService.getStore(receipt.getMchNo(), receipt.getTermId());
+    Store store;
+    if ("CB".equals(receipt.getSvcType())) { //현금영수증
+      store = storeService.findAllByBusinessNoAndDeviceId(receipt.getBusinessNo(), receipt.getTermId());
+    } else {
+      store = storeService.getStore(receipt.getMchNo(), receipt.getTermId());
+    }
 
     if (store == null) {
       receipt.setAnswerCd("ER02"); //가맹점 없음

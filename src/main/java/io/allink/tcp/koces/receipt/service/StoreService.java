@@ -1,6 +1,8 @@
 package io.allink.tcp.koces.receipt.service;
 
 
+import java.util.List;
+
 import io.allink.tcp.koces.receipt.model.Store;
 import io.allink.tcp.koces.receipt.repository.StoreRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -16,12 +18,16 @@ public class StoreService {
     }
 
     public Store getStore(String storeUid, String deviceId) {
-        return storeRepository.findByMerchantStoreIdAndDeviceId(storeUid, deviceId).orElse(null);
-//        return storeRepository.findTopByStoreUidLikeAndBusinessNo(storeUid)
+        return storeRepository.findByMerchantStoreIdAndDeviceId(storeUid, deviceId);
 //            businessNo.replaceAll("(\\d{3})(\\d{2})(\\d{5})", "$1-$2-$3")).orElse(null);
     }
 
-    /*public StoreEntity findTopByBusinessNoOrderByRegDateDesc(String businessNo) {
-        return storeRepository.findTopByBusinessNoOrderByRegDateDesc(businessNo).orElse(null);
-    }*/
+    public Store findAllByBusinessNoAndDeviceId(String businessNo, String deviceId) {
+        final List<Store> stores = storeRepository.findAllByBusinessNoAndDeviceId(
+            businessNo.replaceAll("(\\d{3})(\\d{2})(\\d{5})", "$1-$2-$3"), deviceId);
+        if (stores.isEmpty()) {
+            return null;
+        }
+        return stores.get(0);
+    }
 }

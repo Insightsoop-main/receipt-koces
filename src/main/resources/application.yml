@@ -85,7 +85,8 @@ spring:
       ddl-auto: none
     show-sql: true
 server:
-  port: 10033
+  netty:
+    port: 10033
 
 # production 실 운영 환경
 ---

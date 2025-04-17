@@ -15,7 +15,7 @@
     <springProfile name="production">
         <property name="FILE_PATH" value="/app/logs"/>
         <property name="PATTERN" value="%d{HH:mm:ss.SSS}:[%cyan(%X{reqID:-startup})][%.20thread] %-4level [%logger{5}.%method:%line]- %msg%n"/>
-        <property name="LOG_LEVEL_HIBERNATE" value="debug"/>
+        <property name="LOG_LEVEL_HIBERNATE" value="info"/>
     </springProfile>
 
     <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">

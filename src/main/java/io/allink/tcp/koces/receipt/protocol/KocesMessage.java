@@ -97,17 +97,21 @@ public class KocesMessage {
     this.answerCd = message.getAnswerCd();
     this.svcType = message.getSvcType();
     this.trdType = message.getTrdType();
+    String pref = "";
+    if("D2".equals(trdType)) {
+      pref = "-";
+    }
     this.trdUniKey = message.getTrdUniKey();
     this.termId = message.getTermId();
     this.businessNo = message.getBusinessNo();
     this.cardNo = message.getCardNo();
     this.payGubun = message.getPayGubun();
     this.insMon = message.getInsMon();
-    this.trdAmtTot = message.getTrdAmtTot();
-    this.svcAmt = message.getSvcAmt();
-    this.taxAmt = message.getTaxAmt();
-    this.amt1 = message.getAmt1();
-    this.amt2 = message.getAmt2();
+    this.trdAmtTot = String.valueOf(Long.parseLong(pref + StringUtil.defaultVal(message.getTrdAmtTot(), "0")));
+    this.svcAmt = String.valueOf(Long.parseLong(pref + StringUtil.defaultVal(message.getSvcAmt(), "0")));
+    this.taxAmt = String.valueOf(Long.parseLong(pref + StringUtil.defaultVal(message.getTaxAmt(), "0")));
+    this.amt1 = String.valueOf(Long.parseLong(pref + StringUtil.defaultVal(message.getAmt1(), "0")));
+    this.amt2 = String.valueOf(Long.parseLong(pref + StringUtil.defaultVal(message.getAmt2(), "0")));
     this.auNo = message.getAuNo();
     this.transDate = message.getTransDate();
     this.transTime = message.getTransTime();
