@@ -49,15 +49,15 @@ public class MerchantReceiptService {
   }
 
   @org.springframework.transaction.annotation.Transactional(readOnly = true)
-  public boolean isNotExistsMerchantTag(String merchantId, String deviceId) {
-    String sql = "select 1 from merchant_tag mt where mt.merchant_store_id = ? and mt.device_id = ?";
+  public boolean isNotExistsMerchantTag(/*String merchantId, */String deviceId) {
+    String sql = "select 1 from merchant_tag mt where /*mt.merchant_store_id = ? and */mt.device_id = ?";
     Query query = entityManager.createNativeQuery(sql);
-    query.setParameter(1, merchantId);
-    query.setParameter(2, deviceId);
+//    query.setParameter(1, merchantId);
+    query.setParameter(1, deviceId);
     try {
       query.getSingleResult();
     } catch (NoResultException e) {
-      log.info("등록되지 않은 요청 merchantId: {}, deviceId = {}", merchantId, deviceId);
+      log.info("등록되지 않은 요청 deviceId = {}", /*merchantId,*/ deviceId);
       return true;
     }
     return false;
