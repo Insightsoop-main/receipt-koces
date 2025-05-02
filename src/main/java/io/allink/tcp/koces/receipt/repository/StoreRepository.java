@@ -20,23 +20,9 @@ public interface StoreRepository extends JpaRepository<Store, String> {
         mobile,
         business_no,
         ceo_name
-      from store
-      where store_uid = (select store_uid from merchant_tag where merchant_store_id = ?1 and device_id = ?2)
-      """, nativeQuery = true)
-  Store findByMerchantStoreIdAndDeviceId(String merchantStoreId, String deviceId);
-
-  @Query(value = """
-      select
-        store_name,
-        store_uid,
-        addr1,
-        addr2,
-        mobile,
-        business_no,
-        ceo_name
       from store st
       where business_no = ?1
-            and exists( select 1 from merchant_tag mtag where mtag.store_uid = st.store_uid and mtag.device_id = ?2)
+        and exists( select 1 from merchant_tag mtag where mtag.store_uid = st.store_uid and mtag.device_id = ?2 and merchant_group_id = 'KOCES')
       """, nativeQuery = true)
   List<Store> findAllByBusinessNoAndDeviceId(String businessNo, String deviceId);
 

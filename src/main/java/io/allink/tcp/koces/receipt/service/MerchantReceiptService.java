@@ -50,7 +50,7 @@ public class MerchantReceiptService {
 
   @org.springframework.transaction.annotation.Transactional(readOnly = true)
   public boolean isNotExistsMerchantTag(/*String merchantId, */String deviceId) {
-    String sql = "select 1 from merchant_tag mt where /*mt.merchant_store_id = ? and */mt.device_id = ?";
+    String sql = "select 1 from merchant_tag mt where mt.device_id = ? and mt.merchant_group_id = 'KOCES'";
     Query query = entityManager.createNativeQuery(sql);
 //    query.setParameter(1, merchantId);
     query.setParameter(1, deviceId);

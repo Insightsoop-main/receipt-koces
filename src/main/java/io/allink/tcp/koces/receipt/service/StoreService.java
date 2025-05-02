@@ -17,11 +17,6 @@ public class StoreService {
         this.storeRepository = storeRepository;
     }
 
-    public Store getStore(String storeUid, String deviceId) {
-        return storeRepository.findByMerchantStoreIdAndDeviceId(storeUid, deviceId);
-//            businessNo.replaceAll("(\\d{3})(\\d{2})(\\d{5})", "$1-$2-$3")).orElse(null);
-    }
-
     public Store findAllByBusinessNoAndDeviceId(String businessNo, String deviceId) {
         final List<Store> stores = storeRepository.findAllByBusinessNoAndDeviceId(
             businessNo.replaceAll("(\\d{3})(\\d{2})(\\d{5})", "$1-$2-$3"), deviceId);
