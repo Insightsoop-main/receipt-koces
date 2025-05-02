@@ -63,23 +63,17 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
   public void channelRead(ChannelHandlerContext ctx, Object message) {
     receipt = (KocesMessage) message;
     log.info("Received message: {}", receipt);
-    Store store;
-    if ("CB".equals(receipt.getSvcType())) { //현금영수증
-      store = storeService.findAllByBusinessNoAndDeviceId(receipt.getBusinessNo(), receipt.getTermId());
-    } else {
-      store = storeService.getStore(receipt.getMchNo(), receipt.getTermId());
-    }
-
+    Store store = storeService.findAllByBusinessNoAndDeviceId(receipt.getBusinessNo(), receipt.getTermId());
     if (store == null) {
       receipt.setAnswerCd("ER02"); //가맹점 없음
       log.error("store not found: merchantNo = {} termialId = {}", receipt.getMchNo(), receipt.getTermId());
     } else if (mertReceiptService.isNotExistsMerchantTag( receipt.getTermId())) {
-      log.error("tag not found: merchantNo = {} termialId = {}", receipt.getMchNo(), receipt.getTermId());
+      log.error("tag not found19: merchantNo = {} termialId = {}", receipt.getMchNo(), receipt.getTermId());
       receipt.setAnswerCd("ER02"); //등록된 태그가 없음
     } else if (mertReceiptService.isExists(receipt.getTrdUniKey())) {
       receipt.setAnswerCd("ER01"); //중복 요청
     } else {
-      // ■ 성공 응답
+      // 성공 응답
       receipt.setAnswerCd("0000");
       String svcType = Objects.toString(receipt.getSvcType(), "");
       KocesMessage kocesMessage = new KocesMessage(receipt);
@@ -99,7 +93,7 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
 
       mertReceiptService.insertWithJson(receipt, JsonUtil.toJson(store, kocesMessage));
     }
-    // ■ 응답 발송
+    // 응답 발송
     ByteBuf reqBuf = Unpooled.copiedBuffer(receipt.getResponse(), CharsetUtil.UTF_8);
     ctx.writeAndFlush(reqBuf).addListener(ChannelFutureListener.CLOSE);
 
