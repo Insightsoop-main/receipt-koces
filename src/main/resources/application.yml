@@ -3,12 +3,6 @@ spring:
     active: prod
   application:
     name: koces-receipt
-
-logging:
-  level:
-    org:
-      springframework: DEBUG
-
 server:
   netty:
     port: 11345
