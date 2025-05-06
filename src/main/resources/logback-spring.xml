@@ -4,18 +4,15 @@
     <property name="FILE_PATH" value="/home/ec2-user/kocesReceipt/logs/kocesreceipt-log"/>
     <property name="PATTERN_FILE_NAME" value="%d{yyyy-MM-dd}"/>
     <property name="PATTERN" value="%d{HH:mm:ss.SSS}:[%X{reqID:-startup}][%.20thread] %-4level [%logger{5}.%method:%line]- %msg%n"/>
-    <property name="LOG_LEVEL_HIBERNATE" value="info"/>
 
-    <springProfile name="!(dev | prod)">
+    <springProfile name="!(dev | prod | production)">
         <property name="FILE_PATH" value="/Volumes/Workspaces/workspace/projects/Allink/app/bitbucket/e-receipt-koces-tcp/logs"/>
         <property name="PATTERN" value="%d{HH:mm:ss.SSS}:[%cyan(%X{reqID:-startup})][%.20thread] %-4level [%logger{5}.%method:%line]- %msg%n"/>
-        <property name="LOG_LEVEL_HIBERNATE" value="debug"/>
     </springProfile>
 
     <springProfile name="production">
         <property name="FILE_PATH" value="/app/logs"/>
         <property name="PATTERN" value="%d{HH:mm:ss.SSS}:[%cyan(%X{reqID:-startup})][%.20thread] %-4level [%logger{5}.%method:%line]- %msg%n"/>
-        <property name="LOG_LEVEL_HIBERNATE" value="info"/>
     </springProfile>
 
     <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
@@ -62,7 +59,7 @@
         </rollingPolicy>
     </appender>
 
-    <springProfile name="!production">
+    <springProfile name="!(production)">
         <root level="debug">
             <appender-ref ref="Console"/>
             <appender-ref ref="InfoFile"/>
@@ -82,21 +79,18 @@
                 <maxHistory>30</maxHistory>
             </rollingPolicy>
         </appender>
-
-        <logger name="org.hibernate.type.descriptor.sql.BasicBinder" additivity="false" level="${LOG_LEVEL_HIBERNATE}">
+        <logger name="org.hibernate.type.descriptor.sql.BasicBinder" additivity="false" level="INFO">
             <appender-ref ref="sqlRollingFile" />
         </logger>
-
-        <logger name="org.hibernate.SQL" additivity="false" level="${LOG_LEVEL_HIBERNATE}">
+        <logger name="org.hibernate.SQL" additivity="false" level="INFO">
             <appender-ref ref="sqlRollingFile" />
         </logger>
         <logger name="software.amazon.awssdk" additivity="false" level="WARN" >
             <appender-ref ref="sqlRollingFile" />
         </logger>
-        <logger name="software.amazon.awssdk.request" additivity="false" level="DEBUG" >
+        <logger name="software.amazon.awssdk.request" additivity="false" level="INFO" >
             <appender-ref ref="sqlRollingFile" />
         </logger>
-
     </springProfile>
 
     <springProfile name="production">
