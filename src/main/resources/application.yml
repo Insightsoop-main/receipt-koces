@@ -55,7 +55,9 @@ spring:
       ddl-auto: none
     show-sql: true
 server:
-  port: 8080
+  netty:
+    port: 11345
+
 ---
 spring:
   config:
@@ -80,7 +82,9 @@ spring:
     show-sql: true
 server:
   netty:
-    port: 10033
+    port: 11345
+  port: 28080
+
 
 # production 실 운영 환경
 ---

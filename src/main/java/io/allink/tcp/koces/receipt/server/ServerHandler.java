@@ -66,11 +66,12 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
     Store store = storeService.findAllByBusinessNoAndDeviceId(receipt.getBusinessNo(), receipt.getTermId());
     if (store == null) {
       receipt.setAnswerCd("ER02"); //가맹점 없음
-      log.error("store not found: merchantNo = {} termialId = {}", receipt.getMchNo(), receipt.getTermId());
+      log.error("가맹점 없음 : businessNo = {} terminalId = {}", receipt.getBusinessNo(), receipt.getTermId());
     } else if (mertReceiptService.isNotExistsMerchantTag( receipt.getTermId())) {
-      log.error("tag not found19: merchantNo = {} termialId = {}", receipt.getMchNo(), receipt.getTermId());
+      log.error("태그 없음 : merchantNo = {} terminalId = {}", receipt.getMchNo(), receipt.getTermId());
       receipt.setAnswerCd("ER02"); //등록된 태그가 없음
-    } else if (mertReceiptService.isExists(receipt.getTrdUniKey())) {
+    } else if (mertReceiptService.isExists((receipt.getTransDate() + "-" + receipt.getTrdUniKey()).trim())) {
+      log.info("중복 전문 수신 trxId: {}", (receipt.getTransDate() + "-" + receipt.getTrdUniKey()).trim());
       receipt.setAnswerCd("ER01"); //중복 요청
     } else {
       // 성공 응답
@@ -95,6 +96,7 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
     }
     // 응답 발송
     ByteBuf reqBuf = Unpooled.copiedBuffer(receipt.getResponse(), CharsetUtil.UTF_8);
+    log.info("Server response: {}", receipt.getResponse());
     ctx.writeAndFlush(reqBuf).addListener(ChannelFutureListener.CLOSE);
 
   }

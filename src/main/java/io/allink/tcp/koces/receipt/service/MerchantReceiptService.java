@@ -30,7 +30,7 @@ public class MerchantReceiptService {
     query.setParameter(1, receipt.getMchNo());
     query.setParameter(2, payload);
     query.setParameter(3, receipt.getTermId());
-    query.setParameter(4, "koces-" + receipt.getTrdUniKey());
+    query.setParameter(4, "koces-" + (receipt.getTransDate() + "-" + receipt.getTrdUniKey()).trim());
     query.executeUpdate();
   }
 
@@ -44,7 +44,6 @@ public class MerchantReceiptService {
     } catch (NoResultException e) {
       return false;
     }
-    log.info("중복 전문 수신 trxId: {}", trxId);
     return true;
   }
 

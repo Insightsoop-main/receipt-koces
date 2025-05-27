@@ -14,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @Setter
 @Getter
-@ToString
 public class KocesMessage {
   @JsonIgnore
   private String msgLength;       // 전문길이 (4)
@@ -130,5 +129,44 @@ public class KocesMessage {
     this.dscYn = message.getDscYn();
     this.vanCode = message.getVanCode();
     this.filler = message.getFiller();
+  }
+
+  @Override
+  public String toString() {
+    return "KocesMessage{" +
+        "\nmsgLength='" + msgLength + '\'' +
+        ",\nanswerCd='" + answerCd + '\'' +
+        ",\nsvcType='" + svcType + '\'' +
+        ",\ntrdType='" + trdType + '\'' +
+        ",\ntrdUniKey='" + trdUniKey + '\'' +
+        ",\ntermId='" + termId + '\'' +
+        ",\nbusinessNo='" + businessNo + '\'' +
+        ",\ncardNo='" + cardNo + '\'' +
+        ",\npayGubun='" + payGubun + '\'' +
+        ",\ninsMon='" + insMon + '\'' +
+        ",\ntrdAmtTot='" + trdAmtTot + '\'' +
+        ",\nsvcAmt='" + svcAmt + '\'' +
+        ",\ntaxAmt='" + taxAmt + '\'' +
+        ",\namt1='" + amt1 + '\'' +
+        ",\namt2='" + amt2 + '\'' +
+        ",\nauNo='" + auNo + '\'' +
+        ",\ntransDate='" + transDate + '\'' +
+        ",\ntransTime='" + transTime + '\'' +
+        ",\nauDate='" + auDate + '\'' +
+        ",\noriTrdUniKey='" + oriTrdUniKey + '\'' +
+        ",\noriAuNo='" + oriAuNo + '\'' +
+        ",\ncancelCd='" + cancelCd + '\'' +
+        ",\nissCd='" + issCd + '\'' +
+        ",\nbuyCd='" + buyCd + '\'' +
+        ",\nddcYn='" + ddcYn + '\'' +
+        ",\nswipe='" + swipe + '\'' +
+        ",\nmchNo='" + mchNo + '\'' +
+        ",\nmchData='" + mchData + '\'' +
+        ",\ncheckYn='" + checkYn + '\'' +
+        ",\nforeignYn='" + foreignYn + '\'' +
+        ",\ndscYn='" + dscYn + '\'' +
+        ",\nvanCode='" + vanCode + '\'' +
+        ",\nfiller='" + filler + '\'' +
+        '}';
   }
 }
