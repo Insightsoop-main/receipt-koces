@@ -1,30 +1,20 @@
 FROM eclipse-temurin:17-jre-jammy
 
-ARG PROFILE
-ARG SERVER_PORT
-ARG RECEIPT_DATASOURCE_PG_URL
-ARG RECEIPT_DATASOURCE_PG_USERNAME
-ARG RECEIPT_DATASOURCE_PG_PASSWORD
-
 # 타임존 설정
 ENV TZ=Asia/Seoul
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-ENV \
-    SPRING_PROFILES_ACTIVE=$PROFILE \
-    JAVA_OPTS="--add-exports java.base/sun.net.www.protocol.https=ALL-UNNAMED \
-               -Dserver.port=$SERVER_PORT \
-               -Dspring.datasource.url=$RECEIPT_DATASOURCE_PG_URL \
-               -Dspring.datasource.username=$RECEIPT_DATASOURCE_PG_USERNAME \
-               -Dspring.datasource.password=$RECEIPT_DATASOURCE_PG_PASSWORD"
+# JVM 옵션 (시크릿/접속정보는 baked-in 하지 않음. 런타임에 docker run -e 로 주입)
+# 필수 환경변수: SPRING_PROFILES_ACTIVE, DB_PASSWORD
+ENV JAVA_OPTS="--add-exports java.base/sun.net.www.protocol.https=ALL-UNNAMED"
 
 # 작업 디렉터리 설정
 WORKDIR /app
 
 COPY build/libs/koces-receipt-v1.0.jar ./app.jar
 
-# 포트 노출 (스프링 부트 기본 포트)
-EXPOSE $SERVER_PORT
+# 포트 노출 (KOCES TCP 수신 포트)
+EXPOSE 10033
 
 # 진입점
 ENTRYPOINT ["sh", "-c", "exec java ${JAVA_OPTS} -jar /app/app.jar"]
