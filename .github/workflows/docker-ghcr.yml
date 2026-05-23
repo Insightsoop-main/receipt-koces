@@ -8,7 +8,6 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  BUILD_ARG_PROFILE: "production"  # build-arg 값 정의
 
 jobs:
   build-and-push:
@@ -27,17 +26,14 @@ jobs:
         run: |
           echo "IMAGE_NAME=$(echo "${{ github.repository_owner }}/${{ github.event.repository.name }}" | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
-      # 2. 환경 변수 출력 (디버깅용)
+      # 2. 환경 변수 출력 (디버깅용, 시크릿 값은 노출하지 않음)
       - name: Print environment variables
         run: |
           echo "REGISTRY: ${{ env.REGISTRY }}"
           echo "IMAGE_NAME: ${{ env.IMAGE_NAME }}"
-          echo "BUILD_ARG_PROFILE: ${{ env.BUILD_ARG_PROFILE }}"
-          echo "GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN != '' }}"
           echo "GITHUB_REF: ${{ github.ref }}"
-          echo "TARGET_INSTANCE_ID: ${{ vars.TARGET_INSTANCE_ID }}"
-          echo "SSH_USER: ${{ vars.SSH_USER }}"
-          echo "GHCR_RECEIPT_TOKEN: ${{ secrets.GHCR_RECEIPT_TOKEN }}"
+          echo "EC2_INSTANCE_ID set: ${{ secrets.EC2_INSTANCE_ID != '' }}"
+          echo "AWS_ACCESS_KEY_ID set: ${{ secrets.AWS_ACCESS_KEY_ID != '' }}"
 
       # 3. 코드 체크아웃
       - name: Checkout repository
@@ -84,25 +80,23 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          build-args: | # Docker 빌드 시 전달할 인수들
-            PROFILE=${{ env.BUILD_ARG_PROFILE }}
-            SERVER_PORT=${{ vars.SERVER_PORT }}
-            RECEIPT_DATASOURCE_PG_URL=${{ secrets.RECEIPT_DATASOURCE_PG_URL }}
-            RECEIPT_DATASOURCE_PG_USERNAME=${{ secrets.RECEIPT_DATASOURCE_PG_USERNAME }}
-            RECEIPT_DATASOURCE_PG_PASSWORD=${{ secrets.RECEIPT_DATASOURCE_PG_PASSWORD }}
+          # NOTE: build-args 제거됨. 접속정보·시크릿은 EC2 런타임 환경변수로 주입
+          # (EC2 측 /etc/koces-receipt.env + pull_and_run.sh 참고)
 
       # 10. AWS 자격 증명 설정
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: ap-northeast-2
-          aws-access-key-id: ${{ secrets.AWS_MOGGY_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_MOGGY_SECRET_ACCESS_KEY }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      # 11. AWS Systems Manager(SSM)을 통해 원격 인스턴스에서 스크립트 실행
+      # 11. AWS Systems Manager(SSM)을 통해 원격 인스턴스에서 배포 스크립트 실행
+      # SSH 키 관리 불필요, 모든 배포가 SSM 감사 로그에 남음
       - name: Execute Script via SSM
         run: |
           aws ssm send-command \
-            --targets "Key=tag:${{ vars.INST_TAG_KEY }},Values=${{ vars.INST_TAG_VAL }}" \
+            --instance-ids "${{ secrets.EC2_INSTANCE_ID }}" \
             --document-name "AWS-RunShellScript" \
-            --parameters '{"commands":["cd /home/ec2-user && ./pull_and_run.sh"]}'
+            --parameters '{"commands":["cd /home/ec2-user && ./pull_and_run.sh"]}' \
+            --comment "Deploy receipt-koces from GHA $GITHUB_SHA"
