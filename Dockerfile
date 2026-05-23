@@ -14,7 +14,7 @@ WORKDIR /app
 COPY build/libs/koces-receipt-v1.0.jar ./app.jar
 
 # 포트 노출 (KOCES TCP 수신 포트)
-EXPOSE 10033
+EXPOSE 11345
 
 # 진입점
 ENTRYPOINT ["sh", "-c", "exec java ${JAVA_OPTS} -jar /app/app.jar"]

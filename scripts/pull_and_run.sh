@@ -20,7 +20,7 @@ set -euo pipefail
 
 IMAGE="ghcr.io/insightsoop-main/receipt-koces:latest"
 CONTAINER_NAME="koces-receipt"
-PORT=10033
+PORT=11345
 ENV_FILE="/etc/koces-receipt.env"
 
 log() { echo "[$(date -u +%FT%TZ)] $*"; }

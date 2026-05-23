@@ -31,7 +31,7 @@ spring:
       ddl-auto: none
     show-sql: true
 server:
-  port: 10033
+  port: 11345
 
 ---
 spring:
@@ -56,7 +56,7 @@ spring:
       ddl-auto: none
     show-sql: true
 server:
-  port: 10033
+  port: 11345
 ---
 spring:
   config:
@@ -80,7 +80,7 @@ spring:
       ddl-auto: none
     show-sql: true
 server:
-  port: 10033
+  port: 11345
 
 # production 실 운영 환경
 ---
