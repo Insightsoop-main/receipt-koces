@@ -21,7 +21,7 @@ spring:
     hikari:
       auto-commit: true
       connection-timeout: 10000
-      maximum-pool-size: 15
+      maximum-pool-size: 5
       minimum-idle: 1
   jpa:
     database: postgresql
@@ -47,7 +47,7 @@ spring:
     hikari:
       auto-commit: true
       connection-timeout: 10000
-      maximum-pool-size: 15
+      maximum-pool-size: 5
       minimum-idle: 1
   jpa:
     database: postgresql
@@ -72,7 +72,7 @@ spring:
     hikari:
       auto-commit: true
       connection-timeout: 10000
-      maximum-pool-size: 15
+      maximum-pool-size: 5
       minimum-idle: 1
   jpa:
     database: postgresql
