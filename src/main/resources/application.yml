@@ -14,9 +14,9 @@ spring:
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
   datasource:
-    url: jdbc:postgresql://allink-receipt-dev.cqska7qadd9r.ap-northeast-2.rds.amazonaws.com:5432/allink-receipt-db
-    username: allink-admin
-    password: "!receipt12#$"
+    url: jdbc:postgresql://aws-1-ap-northeast-2.pooler.supabase.com:5432/postgres?sslmode=require
+    username: postgres.wqrzlfhhecugscdlyfhf
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
     hikari:
       auto-commit: true
@@ -40,9 +40,9 @@ spring:
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
   datasource:
-    url: jdbc:postgresql://allink-receipt-dev.cqska7qadd9r.ap-northeast-2.rds.amazonaws.com:5432/allink-receipt-db
-    username: allink-admin
-    password: "!receipt12#$"
+    url: jdbc:postgresql://aws-1-ap-northeast-2.pooler.supabase.com:5432/postgres?sslmode=require
+    username: postgres.wqrzlfhhecugscdlyfhf
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
     hikari:
       auto-commit: true
@@ -57,7 +57,6 @@ spring:
 server:
   netty:
     port: 11345
-
 ---
 spring:
   config:
@@ -84,7 +83,6 @@ server:
   netty:
     port: 11345
   port: 28080
-
 
 # production 실 운영 환경
 ---

@@ -16,6 +16,7 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.util.AttributeKey;
 import io.netty.util.CharsetUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +36,7 @@ import static io.allink.tcp.koces.receipt.common.Code.TRD_TYPE_MAP;
 @RequiredArgsConstructor
 public class ServerHandler extends ChannelInboundHandlerAdapter {
 
-  private KocesMessage receipt;
+  private static final AttributeKey<KocesMessage> RECEIPT_KEY = AttributeKey.valueOf("koces.receipt");
 
   private final StoreService storeService;
 
@@ -61,7 +62,8 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
 
   @Override
   public void channelRead(ChannelHandlerContext ctx, Object message) {
-    receipt = (KocesMessage) message;
+    KocesMessage receipt = (KocesMessage) message;
+    ctx.channel().attr(RECEIPT_KEY).set(receipt);
     log.info("Received message: {}", receipt);
     Store store = storeService.findAllByBusinessNoAndDeviceId(receipt.getBusinessNo(), receipt.getTermId());
     if (store == null) {
@@ -104,9 +106,12 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
   @Override
   public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
     // 실패 응답
-    receipt.setAnswerCd("ER03");
-    ByteBuf reqBuf = Unpooled.copiedBuffer(receipt.getResponse(), CharsetUtil.UTF_8);
-    ctx.writeAndFlush(reqBuf).addListener(ChannelFutureListener.CLOSE);
+    KocesMessage receipt = ctx.channel().attr(RECEIPT_KEY).get();
+    if (receipt != null) {
+      receipt.setAnswerCd("ER03");
+      ByteBuf reqBuf = Unpooled.copiedBuffer(receipt.getResponse(), CharsetUtil.UTF_8);
+      ctx.writeAndFlush(reqBuf).addListener(ChannelFutureListener.CLOSE);
+    }
 
     // Close the connection when an exception is raised.
     ctx.close();
