@@ -18,8 +18,9 @@ public class StoreService {
     }
 
     public Store findAllByBusinessNoAndDeviceId(String businessNo, String deviceId) {
-        final List<Store> stores = storeRepository.findAllByBusinessNoAndDeviceId(
-            businessNo.replaceAll("(\\d{3})(\\d{2})(\\d{5})", "$1-$2-$3"), deviceId);
+        // 신 환경(Supabase): store.business_no는 하이픈 없는 10자리 숫자로 저장됨
+        // KOCES가 보내는 businessNo도 동일 형식이라 변환 불필요
+        final List<Store> stores = storeRepository.findAllByBusinessNoAndDeviceId(businessNo, deviceId);
         if (stores.isEmpty()) {
             return null;
         }
