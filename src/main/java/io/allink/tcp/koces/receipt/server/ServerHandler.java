@@ -9,6 +9,7 @@ import io.allink.tcp.koces.receipt.protocol.KocesMessage;
 import io.allink.tcp.koces.receipt.service.MerchantReceiptService;
 import io.allink.tcp.koces.receipt.service.StoreService;
 import io.allink.tcp.koces.receipt.util.JsonUtil;
+import io.allink.tcp.koces.receipt.util.PayloadNormalizer;
 import io.allink.tcp.koces.receipt.util.StringUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -94,7 +95,9 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
       kocesMessage.setForeignYn(FOREIGN_YN_MAP.getOrDefault(svcType + receipt.getForeignYn(), svcType + receipt.getForeignYn()));
       kocesMessage.setSwipe(SWIPE_MAP.getOrDefault(receipt.getSwipe(), receipt.getSwipe()));
       // mchNo는 KOCES 원본값 그대로 저장 (store_uid로 덮어쓰지 않음)
-      mertReceiptService.insertWithJson(receipt, JsonUtil.toJson(store, kocesMessage));
+      String payloadJson    = JsonUtil.toJson(store, kocesMessage);
+      String normalizedJson = PayloadNormalizer.toNormalizedJson(store, kocesMessage);
+      mertReceiptService.insertWithJson(receipt, payloadJson, normalizedJson);
     }
     // 응답 발송
     ByteBuf reqBuf = Unpooled.copiedBuffer(receipt.getResponse(), CharsetUtil.UTF_8);

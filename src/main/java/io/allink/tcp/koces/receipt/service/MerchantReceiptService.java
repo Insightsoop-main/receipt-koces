@@ -21,9 +21,11 @@ public class MerchantReceiptService {
   }
 
   @Transactional
-  public void insertWithJson(KocesMessage receipt, String payload) {
+  public void insertWithJson(KocesMessage receipt, String payload, String normalizedPayload) {
 
-    String sql = "INSERT INTO merchant_receipt(receipt_uuid, reg_date, merchant_store_id, payload, device_id, trx_id) VALUES (uuid_generate_v4(), now(), ?, ?::json, ?, ?)";
+    String sql = "INSERT INTO merchant_receipt(" +
+        "receipt_uuid, reg_date, merchant_store_id, payload, device_id, trx_id, van_type, normalized_payload" +
+        ") VALUES (uuid_generate_v4(), now(), ?, ?::jsonb, ?, ?, ?, ?::jsonb)";
 
     Query query = entityManager.createNativeQuery(sql);
 
@@ -31,6 +33,8 @@ public class MerchantReceiptService {
     query.setParameter(2, payload);
     query.setParameter(3, receipt.getTermId());
     query.setParameter(4, "koces-" + (receipt.getTransDate() + "-" + receipt.getTrdUniKey()).trim());
+    query.setParameter(5, "KOCES");
+    query.setParameter(6, normalizedPayload);
     query.executeUpdate();
   }
 
