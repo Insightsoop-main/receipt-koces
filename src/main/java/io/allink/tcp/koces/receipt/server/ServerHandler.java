@@ -93,7 +93,7 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
       kocesMessage.setCheckYn(CHECK_YN_MAP.getOrDefault(svcType + receipt.getCheckYn(), svcType + receipt.getCheckYn()));
       kocesMessage.setForeignYn(FOREIGN_YN_MAP.getOrDefault(svcType + receipt.getForeignYn(), svcType + receipt.getForeignYn()));
       kocesMessage.setSwipe(SWIPE_MAP.getOrDefault(receipt.getSwipe(), receipt.getSwipe()));
-      receipt.setMchNo(store.getStoreUid());
+      // mchNo는 KOCES 원본값 그대로 저장 (store_uid로 덮어쓰지 않음)
       mertReceiptService.insertWithJson(receipt, JsonUtil.toJson(store, kocesMessage));
     }
     // 응답 발송
