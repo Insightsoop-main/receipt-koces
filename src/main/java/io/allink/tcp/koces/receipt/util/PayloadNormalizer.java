@@ -59,6 +59,11 @@ public final class PayloadNormalizer {
             n.tax               = toInt(p != null ? p.getTaxAmt()    : null);
             n.serviceAmount     = toInt(p != null ? p.getSvcAmt()    : null);
             n.amount            = n.total - n.tax - n.serviceAmount;
+            // 거래구분(승인/취소)은 취소 영수증을 승인과 구분하는 유일한 근거다.
+            // 취소는 원거래의 승인번호를 그대로 실어오므로, 이 값이 없으면
+            // 소비 측에서 "같은 승인번호 = 중복"으로 오판해 취소 영수증이 사라진다.
+            n.trdType           = safe(p != null ? p.getTrdType()  : null);
+            n.cancelCode        = safe(p != null ? p.getCancelCd() : null);
             n.transactionDate   = p != null
                 ? toKstIso(p.getTransDate(), p.getTransTime())
                 : "";
@@ -164,6 +169,8 @@ public final class PayloadNormalizer {
         @JsonProperty("tax")                 public int tax;
         @JsonProperty("service_amount")      public int serviceAmount;
         @JsonProperty("amount")              public int amount;
+        @JsonProperty("trd_type")            public String trdType;      // 승인 | 취소
+        @JsonProperty("cancel_code")         public String cancelCode;   // 일반취소 | 망취소 | …
         @JsonProperty("transaction_date")    public String transactionDate;
     }
 }
