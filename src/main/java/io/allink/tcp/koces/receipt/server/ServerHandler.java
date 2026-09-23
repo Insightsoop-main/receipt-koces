@@ -67,13 +67,23 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
     ctx.channel().attr(RECEIPT_KEY).set(receipt);
     log.info("Received message: {}", receipt);
     Store store = storeService.findAllByBusinessNoAndDeviceId(receipt.getBusinessNo(), receipt.getTermId());
+
+    // 미등록이어도 받아서 쌓아둔다.
+    //   버리면 뒤늦게 상점·단말을 등록해도 그 사이 영수증을 되살릴 방법이 없다.
+    //   거부 응답을 주면 VAN사 쪽에 오류로 쌓이고 재전송을 유발하기도 한다.
+    //   status로 표시해 두고 어드민에서 사후 등록으로 처리한다.
+    String status = null;
     if (store == null) {
-      receipt.setAnswerCd("ER02"); //가맹점 없음
-      log.error("가맹점 없음 : businessNo = {} terminalId = {}", receipt.getBusinessNo(), receipt.getTermId());
-    } else if (mertReceiptService.isNotExistsMerchantTag( receipt.getTermId())) {
-      log.error("태그 없음 : merchantNo = {} terminalId = {}", receipt.getMchNo(), receipt.getTermId());
-      receipt.setAnswerCd("ER02"); //등록된 태그가 없음
-    } else if (mertReceiptService.isExists((receipt.getTransDate() + "-" + receipt.getTrdUniKey()).trim())) {
+      status = "NO_STORE";
+      log.warn("미등록 가맹점 수신 - 적재 후 사후 등록 대상 : businessNo = {} terminalId = {}",
+          receipt.getBusinessNo(), receipt.getTermId());
+    } else if (mertReceiptService.isNotExistsMerchantTag(receipt.getTermId())) {
+      status = "NO_TAG";
+      log.warn("태그 없음 - 적재 후 사후 등록 대상 : merchantNo = {} terminalId = {}",
+          receipt.getMchNo(), receipt.getTermId());
+    }
+
+    if (mertReceiptService.isExists((receipt.getTransDate() + "-" + receipt.getTrdUniKey()).trim())) {
       log.info("중복 전문 수신 trxId: {}", (receipt.getTransDate() + "-" + receipt.getTrdUniKey()).trim());
       receipt.setAnswerCd("ER01"); //중복 요청
     } else {
@@ -97,7 +107,7 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
       // mchNo는 KOCES 원본값 그대로 저장 (store_uid로 덮어쓰지 않음)
       String payloadJson    = JsonUtil.toJson(store, kocesMessage);
       String normalizedJson = PayloadNormalizer.toNormalizedJson(store, kocesMessage);
-      mertReceiptService.insertWithJson(receipt, payloadJson, normalizedJson);
+      mertReceiptService.insertWithJson(receipt, payloadJson, normalizedJson, status);
     }
     // 응답 발송
     ByteBuf reqBuf = Unpooled.copiedBuffer(receipt.getResponse(), CharsetUtil.UTF_8);
