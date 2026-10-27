@@ -64,6 +64,10 @@ public final class PayloadNormalizer {
             // 소비 측에서 "같은 승인번호 = 중복"으로 오판해 취소 영수증이 사라진다.
             n.trdType           = safe(p != null ? p.getTrdType()  : null);
             n.cancelCode        = safe(p != null ? p.getCancelCd() : null);
+            // 거래 고유키. 중복 판정의 기준이 되고, oriTrdUniKey 는 취소가 가리키는
+            // 원거래다 — 복권을 주고 나서 취소되면 어느 건을 회수할지 이 값으로 찾는다.
+            n.trdUniKey         = safe(p != null ? p.getTrdUniKey()    : null);
+            n.oriTrdUniKey      = safe(p != null ? p.getOriTrdUniKey() : null);
             n.transactionDate   = p != null
                 ? toKstIso(p.getTransDate(), p.getTransTime())
                 : "";
@@ -171,6 +175,8 @@ public final class PayloadNormalizer {
         @JsonProperty("amount")              public int amount;
         @JsonProperty("trd_type")            public String trdType;      // 승인 | 취소
         @JsonProperty("cancel_code")         public String cancelCode;   // 일반취소 | 망취소 | …
+        @JsonProperty("trd_uni_key")         public String trdUniKey;
+        @JsonProperty("ori_trd_uni_key")     public String oriTrdUniKey;
         @JsonProperty("transaction_date")    public String transactionDate;
     }
 }
