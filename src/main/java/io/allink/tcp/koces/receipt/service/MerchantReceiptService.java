@@ -21,11 +21,16 @@ public class MerchantReceiptService {
   }
 
   @Transactional
-  public void insertWithJson(KocesMessage receipt, String payload, String normalizedPayload) {
+  /**
+   * status: 미등록 수신이면 NO_STORE / NO_TAG, 정상이면 null.
+   * 정리 주기가 이 값을 보고 갈린다 — 미등록 건은 사후 등록으로 살릴 수 있게 더 오래 둔다.
+   */
+  public void insertWithJson(KocesMessage receipt, String payload, String normalizedPayload,
+                             String status) {
 
     String sql = "INSERT INTO merchant_receipt(" +
-        "receipt_uuid, reg_date, merchant_store_id, payload, device_id, trx_id, van_type, normalized_payload" +
-        ") VALUES (uuid_generate_v4(), now(), ?, ?::jsonb, ?, ?, ?, ?::jsonb)";
+        "receipt_uuid, reg_date, merchant_store_id, payload, device_id, trx_id, van_type, normalized_payload, status" +
+        ") VALUES (uuid_generate_v4(), now(), ?, ?::jsonb, ?, ?, ?, ?::jsonb, ?)";
 
     Query query = entityManager.createNativeQuery(sql);
 
@@ -35,6 +40,7 @@ public class MerchantReceiptService {
     query.setParameter(4, "koces-" + (receipt.getTransDate() + "-" + receipt.getTrdUniKey()).trim());
     query.setParameter(5, "KOCES");
     query.setParameter(6, normalizedPayload);
+    query.setParameter(7, status);
     query.executeUpdate();
   }
 
